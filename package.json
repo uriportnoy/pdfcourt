@@ -1,0 +1,55 @@
+{
+  "name": "courtdf",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@xmldom/xmldom": "^0.8.10",
+    "classnames": "^2.5.1",
+    "firebase": "^11.0.2",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.8.2",
+    "mammoth": "^1.7.1",
+    "pdfjs-dist": "^4.9.155",
+    "pdfobject": "^2.3.0",
+    "pizzip": "^3.1.6",
+    "primeicons": "^7.0.0",
+    "primereact": "^10.8.5",
+    "prop-types": "^15.8.1",
+    "quill": "^2.0.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-intersection-observer": "^9.13.1",
+    "react-pdf": "^9.1.1",
+    "react-scripts": "5.0.1",
+    "react-select": "^5.8.3",
+    "react-vertical-timeline-component": "^3.6.0",
+    "sass": "^1.71.1",
+    "styled-components": "^6.1.13",
+    "use-immer": "^0.9.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "electron": "^29.1.1"
+  }
+}

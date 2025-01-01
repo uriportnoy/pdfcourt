@@ -1,19 +1,46 @@
-import { useState } from "react";
+import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
+import { useEffect, useState } from "react";
 
-export default function DialogBtn({ children, title }) {
+export default function DialogBtn({
+  children,
+  title,
+  dialogClassName,
+  btnClassName,
+  header = "Header",
+  isOpen,
+  onClick,
+  onClose,
+}) {
   const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    if (isOpen !== null && isOpen !== undefined && isOpen !== visible) {
+      setVisible(isOpen);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
-      <button onClick={() => setVisible(true)}>{title}</button>
+      <Button
+        label={title}
+        onClick={() => {
+          setVisible(true);
+          onClick && onClick();
+        }}
+        className={btnClassName}
+      />
       <Dialog
-        header="Header"
+        header={header}
         visible={visible}
-        style={{ width: "50vw" }}
+        className={dialogClassName}
         onHide={() => {
-          if (!visible) return;
+          if (!visible) {
+            return;
+          }
           setVisible(false);
+          onClose && onClose();
         }}
       >
         {visible && children}

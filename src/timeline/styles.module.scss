@@ -1,9 +1,79 @@
-.app{
+.app {
   text-align: right;
+
+  .contentWrapper {
+    .content {
+      max-height: 250px;
+      overflow-y: auto;
+      direction: rtl;
+      text-align: right;
+    }
+  }
 }
 
-.formWrapper{
+.formWrapper {
   display: flex;
   flex-direction: column;
   gap: 8px;
+
+  label {
+    display: grid;
+    grid-template-columns: 1fr 5fr;
+    align-items: center;
+    direction: rtl;
+    gap: 8px;
+  }
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  padding: 4px;
+  background: #33333340;
+  z-index: 999;
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+
+  .btn {
+    font-size: 22px;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+  }
+
+  .casesSelect {
+    width: 200px
+  }
+}
+
+
+.dialogPdf {
+  width: 80vw;
+  height: 85vh;
+  @media screen and (max-width: 768px) {
+    width: 100vw;
+    height: 100vh;
+
+  }
+}
+
+:global(.p-dialog){
+  :global(.p-dialog-content){
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position:relative;
+    padding: 16px;
+  }
+  @media screen and (max-width: 768px) {
+    max-height: 100vh;
+    min-width: 90vw;
+
+  }
+}
+:global(.p-dialog-header){
+  padding-bottom: 4px;
 }

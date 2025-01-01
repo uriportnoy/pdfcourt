@@ -1,9 +1,9 @@
-import React, { useState } from "react";
-import { Menu } from "primereact/menu";
-import { deleteEvent } from "./firebase/events";
-import { Dialog } from "primereact/dialog";
+import { useAppContext } from "../Context";
+import { deleteEvent } from "../firebase/events";
 import { FormDialog } from "./AddNewEvent";
-import { useAppContext } from "./Context";
+import { Dialog } from "primereact/dialog";
+import { Menu } from "primereact/menu";
+import React, { useState } from "react";
 
 const ItemMenu = React.forwardRef((props, ref) => {
   const [visible, setVisible] = useState(false);
@@ -18,11 +18,13 @@ const ItemMenu = React.forwardRef((props, ref) => {
         visible={visible}
         style={{ width: "50vw" }}
         onHide={() => {
-          if (!visible) return;
+          if (!visible) {
+            return;
+          }
           setVisible(false);
         }}
       >
-        <FormDialog eventData={props} />
+        <FormDialog eventData={props} close={() => setVisible(false)} />
       </Dialog>
       <Menu
         model={[
@@ -38,7 +40,7 @@ const ItemMenu = React.forwardRef((props, ref) => {
                 label: "Remove",
                 icon: "pi pi-times",
                 command: () => {
-                  deleteEvent(props.id).then(loadEvents);
+                  deleteEvent(props).then(loadEvents);
                 },
               },
             ],

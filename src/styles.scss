@@ -1,4 +1,26 @@
 body{
   background: #e1dccb;
+  margin: 0;
+}
 
+.p-button:focus {
+  box-shadow: none
+}
+.flex-column{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.options{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  width: 100%;
+  max-width: 100%;
+   > div{
+     background: #eee;
+     border-radius: 4px;
+     padding: 4px;
+   }
 }

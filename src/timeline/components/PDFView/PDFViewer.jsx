@@ -1,120 +1,129 @@
-import DialogBtn from "../common/DialogBtn";
-import styles from "../styles.module.scss";
+import Center from "../../../Center";
+import DialogBtn from "../../common/DialogBtn";
+import styles from "../../styles.module.scss";
+import SharePDF from "./SharePDF";
+import { forceDownload, getPdfCanvasPages, getPdfPageViewport } from "./utils";
 import * as pdfjs from "pdfjs-dist/webpack";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Paginator } from "primereact/paginator";
+import { ToggleButton } from "primereact/togglebutton";
+import React, { useCallback, useRef, useState } from "react";
 import styled from "styled-components";
 import "pdfjs-dist/web/pdf_viewer.css";
-import Center from "../../Center";
-import SharePDF from "./SharePDF";
-import { Paginator } from "primereact/paginator";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
-const forceDownload = async (url, label) => {
-  try {
-    const response = await fetch(url);
-    if (!response.ok) throw new Error("Failed to fetch PDF file");
-    const blob = await response.blob();
-    const blobUrl = window.URL.createObjectURL(blob);
-
-    const link = document.createElement("a");
-    link.href = blobUrl;
-    link.download = `${label || "document"}.pdf`; // Filename for the downloaded file
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(blobUrl);
-  } catch (error) {
-    console.error("Error downloading PDF:", error);
-  }
-};
-
-const PDFObject = ({ label, url }) => {
-  return (
-    <DialogBtn title={label} dialogClassName={styles.dialogPdf}>
-      <object data={url} type="application/pdf" width="100%" height="100%">
-        <p>
-          It appears you don't have a PDF plugin for this browser. No biggie...
-          you can <a href={url}>click here to download the PDF file.</a>
-        </p>
-      </object>
-    </DialogBtn>
-  );
-};
 const PDFViewer = ({ fileURL }) => {
   const { label, url } = fileURL;
-  const canvasRef = useRef(null);
+  const wrapperRef = useRef(null);
+  const containerRef = useRef(null);
+  const [multiplePages, setMultiplePages] = useState(false);
+  const [scale, setScale] = useState(window.innerWidth < 700 ? 0.8 : 2); // Initial scale
   const [numPages, setNumPages] = useState(null);
   const [pdfFile, setPdfFile] = useState(null);
-  const [currentPage, setCurrentPage] = useState(null);
-  const containerRef = useRef(null); // Ref for the container to scroll to top
-  const renderTaskRef = useRef(null); // Ref to track the current render task
-  const [scale, setScale] = useState(window.innerWidth < 700 ? 0.8 : 2); // Initial scale
-  const previousPage = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
-
-  const loadPDF = useCallback(
-    async (pageNumber) => {
-      try {
+  const [currentPage, setCurrentPage] = useState(null);
+  const multiplePagesIsLoaded = useRef(false);
+  const getPDF = useCallback(async () => {
+    try {
+      if (!pdfFile) {
         setIsLoading(true);
-        const file = pdfFile || (await pdfjs.getDocument(url).promise);
-        if (!pdfFile) {
-          setNumPages(file.numPages);
-          setPdfFile(file);
-        }
+      }
+      const file = pdfFile || (await pdfjs.getDocument(url).promise);
+      if (!pdfFile) {
+        setNumPages(file.numPages);
+        setPdfFile(file);
+      }
+      if (!pdfFile) {
+        setIsLoading(false);
+      }
+      return file;
+    } catch (error) {
+      console.error("Error loading PDF:", error);
+    }
+  }, [url, pdfFile]);
 
-        const page = await file.getPage(pageNumber);
-        const viewport = page.getViewport({ scale });
-
-        const canvas = canvasRef.current;
-        const context = canvas.getContext("2d");
-
-        if (renderTaskRef.current) {
-          renderTaskRef.current.cancel();
-        }
-
-        // Set canvas size to match PDF viewport
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        renderTaskRef.current = page.render({
-          canvasContext: context,
-          viewport,
-        });
-        await renderTaskRef.current.promise;
-
-        renderTaskRef.current = null;
-
-        // Adjust container size dynamically
+  const loadAllPages = useCallback(
+    async (_scale) => {
+      try {
+        const file = await getPDF();
+        const pageCanvases = await getPdfCanvasPages(file, _scale);
         if (containerRef.current) {
-          containerRef.current.style.width = `${viewport.width}px`;
-          containerRef.current.style.height = `${viewport.height}px`;
-          if (previousPage.current !== pageNumber) {
-            containerRef.current.scrollIntoView({ behavior: "smooth" });
-          }
+          containerRef.current.innerHTML = "";
+          pageCanvases.forEach(({ canvas }) =>
+            containerRef.current.appendChild(canvas)
+          );
+        }
+        if (wrapperRef.current) {
+          wrapperRef.current.style.width = `${pageCanvases[0].viewport.width}px`;
+          wrapperRef.current.style.height = `${pageCanvases[0].viewport.height}px`;
         }
       } catch (error) {
         console.error("Error loading PDF:", error);
-      } finally {
-        setIsLoading(false);
       }
     },
-    [pdfFile, url, scale]
+    [getPDF]
   );
 
-  useEffect(() => {
-    if (currentPage) {
-      loadPDF(currentPage);
-    }
-  }, [loadPDF, currentPage]);
+  const loadPDF = useCallback(
+    async (pageNumber, _scale) => {
+      try {
+        const file = await getPDF();
+        const { canvas, viewport } = await getPdfPageViewport({
+          pdfFile: file,
+          pageNumber,
+          scale: _scale,
+        });
+        if (containerRef.current) {
+          containerRef.current.innerHTML = "";
+          containerRef.current.appendChild(canvas);
+        }
+        if (wrapperRef.current) {
+          wrapperRef.current.style.width = `${viewport.width}px`;
+          wrapperRef.current.style.height = `${viewport.height}px`;
+        }
+        return { canvas, viewport };
+      } catch (error) {
+        console.error("Error loading PDF:", error);
+      }
+    },
+    [getPDF]
+  );
 
-  const handleZoomIn = () => {
-    setScale((prev) => Math.min(prev + 0.2, 3)); // Max zoom level: 3x
+  const loadPdfData = ({ newPage, _scale = scale, multipleDirect = false }) => {
+    setCurrentPage(newPage);
+    if (multiplePages || multipleDirect) {
+      loadAllPages(_scale).then(() => {
+        multiplePagesIsLoaded.current = true;
+      });
+    } else {
+      multiplePagesIsLoaded.current = false;
+      loadPDF(newPage, _scale).then(({ canvas }) => {
+        requestAnimationFrame(() => {
+          containerRef.current.scrollLeft =
+            (canvas.width - containerRef.current.clientWidth) / 2;
+          containerRef.current.scrollTo({ behavior: "smooth" });
+        });
+      });
+    }
   };
 
-  const handleZoomOut = () => {
-    setScale((prev) => Math.max(prev - 0.2, 0.5)); // Min zoom level: 0.5x
+  const handleZoom = (zoomIn = true) => {
+    const newScale = zoomIn
+      ? Math.min(scale + 0.2, 3)
+      : Math.max(scale - 0.2, 0.5);
+    setScale(newScale);
+    loadPdfData({ newPage: currentPage, _scale: newScale });
+  };
+
+  const onPageChange = (event) => {
+    const newPage = event.page + 1;
+    if (multiplePages && multiplePagesIsLoaded.current) {
+      setCurrentPage(newPage);
+      const relevantPage = document.getElementById(`page-${newPage}`);
+      relevantPage.scrollIntoView({ behavior: "smooth" });
+      return;
+    }
+    loadPdfData({ newPage });
   };
 
   return (
@@ -123,7 +132,7 @@ const PDFViewer = ({ fileURL }) => {
       dialogClassName={styles.dialogPdf}
       header={label}
       onClick={() => {
-        setCurrentPage(1);
+        loadPdfData({ newPage: 1 });
       }}
       onClose={() => {
         setCurrentPage(null);
@@ -132,17 +141,17 @@ const PDFViewer = ({ fileURL }) => {
     >
       {isLoading && <Center type="overlay">Loading...</Center>}
       <HiddenOnLoading data-is-loading={isLoading}>
-        <CanvasContainer>
-          <CanvasWrapper ref={containerRef}>
-            <canvas ref={canvasRef}></canvas>
+        <CanvasContainer ref={containerRef}>
+          <CanvasWrapper ref={wrapperRef}>
+            {/*<canvas ref={canvasRef}></canvas>*/}
           </CanvasWrapper>
         </CanvasContainer>
         <ZoomControls>
-          <button onClick={handleZoomOut} disabled={scale <= 0.5}>
+          <button onClick={() => handleZoom(false)} disabled={scale <= 0.5}>
             -
           </button>
           <span>{(scale * 100).toFixed(0)}%</span>
-          <button onClick={handleZoomIn} disabled={scale >= 3}>
+          <button onClick={() => handleZoom()} disabled={scale >= 3}>
             +
           </button>
         </ZoomControls>
@@ -151,9 +160,7 @@ const PDFViewer = ({ fileURL }) => {
             rows={1}
             first={currentPage - 1}
             totalRecords={numPages}
-            onPageChange={(event) => {
-              setCurrentPage(event.page + 1);
-            }}
+            onPageChange={onPageChange}
           />
         </Pagination>
         <Buttons>
@@ -161,6 +168,15 @@ const PDFViewer = ({ fileURL }) => {
             Download PDF
           </button>
           <SharePDF fileURL={fileURL} />
+          <ToggleButton
+            checked={multiplePages}
+            onChange={(e) => {
+              setMultiplePages(e.value);
+              loadPdfData({ newPage: currentPage, multipleDirect: e.value });
+            }}
+            onLabel="Multiple"
+            offLabel="Single"
+          />
         </Buttons>
       </HiddenOnLoading>
     </DialogBtn>
@@ -192,38 +208,6 @@ const Pagination = styled.div`
       min-width: auto;
       width: auto;
     }
-  }
-`;
-const MultiplePdfViewer = ({ fileURL }) => {
-  const isMobile = window.innerWidth < 700;
-  if (!fileURL?.length) {
-    return;
-  }
-  return (
-    <Wrapper>
-      {fileURL.map((pdf, index) =>
-        isMobile ? (
-          <PDFViewer key={index} fileURL={pdf} />
-        ) : (
-          <PDFObject key={index} {...pdf} />
-        )
-      )}
-    </Wrapper>
-  );
-};
-
-const Wrapper = styled.div`
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  direction: rtl;
-  button {
-    height: 28px;
-    border-radius: 2px;
-    font-size: 14px;
-    padding: 0 8px;
-    min-width: fit-content;
-    flex-grow: 1;
   }
 `;
 
@@ -276,4 +260,4 @@ const ZoomControls = styled.div`
     font-weight: bold;
   }
 `;
-export default MultiplePdfViewer;
+export default PDFViewer;

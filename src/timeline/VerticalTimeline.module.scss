@@ -1,7 +1,7 @@
-$mine: #11a12d;
-$notMine: #F32163;
-$court: #d7c134;
-
+$mine: #aaffa0;
+$notMine: #ffa797;
+$court: #f2f09b;
+$trd-party: #e0ceff;
 .wrapper {
   .iconWrapper {
     .icon {
@@ -18,15 +18,33 @@ $court: #d7c134;
   .dateClassName {
     display: flex !important;
     flex-direction: column;
-
-    :global(.caseNumber) {
+  direction: rtl;
+    .caseNumber {
+      padding: 4px;
+      border-radius: 4px;
       color: gold;
       background: #0e7490;
+      width: fit-content;
+    }
+
+    .relatedCases {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-block: 5px;
+      span {
+        padding: 4px;
+        border-radius: 4px;
+        background: #c2c2c2;
+        color: #333;
+      }
     }
   }
-.content{
 
-}
+  .content {
+
+  }
+
   @mixin data-origin-styles($color) {
     .iconWrapper {
       background: $color;
@@ -34,18 +52,25 @@ $court: #d7c134;
     .content {
       background-color: $color;
     }
-    .contentArrowStyle{
+    .contentArrowStyle {
       border-right: 7px solid $color;
 
     }
   }
+
   &[data-origin="court"] {
     @include data-origin-styles($court);
   }
+
   &[data-origin="mine"] {
     @include data-origin-styles($mine);
   }
+
   &[data-origin="notMine"] {
     @include data-origin-styles($notMine);
+  }
+
+  &[data-origin="trd-party"] {
+    @include data-origin-styles($trd-party);
   }
 }

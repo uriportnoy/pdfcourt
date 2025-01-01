@@ -1,15 +1,16 @@
-import React, { useRef } from "react";
-import PropTypes from "prop-types";
-import classNames from "classnames";
-import { InView } from "react-intersection-observer";
 import styles from "./VerticalTimeline.module.scss";
-import ItemMenu from "./ItemMenu";
-import PDFViewer from "./PDFViewer";
+import ItemMenu from "./components/ItemMenu";
+import PDFViewer from "./components/PDFView";
+import classNames from "classnames";
+import PropTypes from "prop-types";
+import React, { useRef } from "react";
+import { InView } from "react-intersection-observer";
 
 const icons = {
-  mine: "./logo.png",
-  notMine: "./logo.png",
+  mine: "home",
+  notMine: "directions",
   court: "hammer",
+  "trd-party": "sparkles",
 };
 
 const VerticalTimelineElement = ({
@@ -21,7 +22,16 @@ const VerticalTimelineElement = ({
   item,
 }) => {
   const menu = useRef(null);
-  const { type, date, caseNumber, fileURL } = item;
+  const {
+    id,
+    type,
+    date,
+    caseNumber,
+    fileURL,
+    relatedCases,
+    relatedEvent,
+    relatedDates,
+  } = item;
 
   return (
     <InView rootMargin="-40px 0px" threshold={0} triggerOnce>
@@ -34,6 +44,7 @@ const VerticalTimelineElement = ({
             "vertical-timeline-element--no-children": children === "",
           })}
           data-origin={type}
+          id={id}
         >
           <React.Fragment>
             <span // eslint-disable-line jsx-a11y/no-static-element-interactions
@@ -44,7 +55,7 @@ const VerticalTimelineElement = ({
                 {
                   "bounce-in": inView || visible,
                   "is-hidden": !(inView || visible),
-                },
+                }
               )}
             >
               <span
@@ -60,44 +71,45 @@ const VerticalTimelineElement = ({
                 {
                   "bounce-in": inView || visible,
                   "is-hidden": !(inView || visible),
-                },
+                }
               )}
             >
               <div
                 className={classNames(
                   styles.contentArrowStyle,
-                  "vertical-timeline-element-content-arrow",
+                  "vertical-timeline-element-content-arrow"
                 )}
               />
               <ItemMenu ref={menu} {...item} />
               {children}
-              {fileURL && (
-                <a href={fileURL} target="_blank" rel="noopener noreferrer">
-                  View File
-                </a>
-              )}
-              {/*{fileURL && <PDFViewer fileURL={fileURL} />}*/}
-              {fileURL && (
-                <object
-                  data={fileURL}
-                  type="application/pdf"
-                  width="100%"
-                  height="100%"
-                >
-                  <p>
-                    Alternative text - include a link{" "}
-                    <a href={fileURL}>to the PDF!</a>
-                  </p>
-                </object>
-              )}
+              <PDFViewer fileURL={fileURL} />
               <span
                 className={classNames(
                   styles.dateClassName,
-                  "vertical-timeline-element-date",
+                  "vertical-timeline-element-date"
                 )}
               >
                 <span>{getDate(date)}</span>
-                <span className="caseNumber">{caseNumber}</span>
+                <span className={styles.caseNumber}>{caseNumber}</span>
+                {relatedCases && (
+                  <div className={styles.relatedCases}>
+                    {relatedCases.map((item) => (
+                      <span key={item}>{item}</span>
+                    ))}
+                  </div>
+                )}
+                {relatedDates && (
+                  <div className={styles.relatedCases}>
+                    {relatedDates.map((_d) => (
+                      <span key={`date_${_d}`}>{_d}</span>
+                    ))}
+                  </div>
+                )}
+                {relatedEvent && (
+                  <div className={styles.relatedEvent}>
+                    <span>{relatedEvent}</span>
+                  </div>
+                )}
               </span>
             </div>
           </React.Fragment>
@@ -112,7 +124,9 @@ function getDate(dateStr) {
   const day = date.getUTCDate(); // UTC day
   const month = date.getUTCMonth() + 1; // Months are 0-based
   const year = date.getUTCFullYear();
-  const formattedDate = `${String(day).padStart(2, "0")}/${String(month).padStart(2, "0")}/${year}`;
+  const formattedDate = `${String(day).padStart(2, "0")}/${String(
+    month
+  ).padStart(2, "0")}/${year}`;
   return formattedDate;
 }
 

@@ -3,34 +3,22 @@ import {
   getStorage,
   uploadBytesResumable,
   ref,
-  deleteObject,
 } from "firebase/storage";
-import { Button } from "primereact/button";
 import { FileUpload } from "primereact/fileupload";
 import { InputText } from "primereact/inputtext";
 import { ProgressBar } from "primereact/progressbar";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import styled from "styled-components";
+import { useImmer } from "use-immer";
 
-const deleteFile = async (url) => {
-  try {
-    const storage = getStorage();
-    const fileRef = ref(storage, url);
-    return await deleteObject(fileRef);
-  } catch (err) {
-    console.log(err);
-    return null;
-  }
-};
-export const customFirebaseUploader = ({
+const customFirebaseUploader = ({
   event,
-  setProgress,
-  setStatus,
+  setProcess,
   cb,
   fileName,
   folderName = "pdfs",
 }) => {
-  const files = event.files; // Files to be uploaded
+  const files = event.files;
   const uploadPromises = files.map((file, index) => {
     return new Promise((resolve, reject) => {
       const storage = getStorage();
@@ -41,33 +29,30 @@ export const customFirebaseUploader = ({
       uploadTask.on(
         "state_changed",
         (snapshot) => {
-          const progress = Math.round(
+          const currentProgress = Math.round(
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100
           );
-          setProgress((prevProgress) => ({
-            ...prevProgress,
-            [file.name]: progress,
-          }));
-          setStatus((prevStatus) => ({
-            ...prevStatus,
-            [file.name]: `Uploading ${file.name}: ${progress}%`,
-          }));
+
+          setProcess((draft) => {
+            draft.value = currentProgress;
+            draft.status = `Uploading ${file.name}: ${currentProgress}%`;
+          });
         },
         (error) => {
           console.error("Error uploading file:", error);
-          setStatus((prevStatus) => ({
-            ...prevStatus,
-            [file.name]: `Error uploading ${file.name}`,
-          }));
+          setProcess((draft) => {
+            draft.value = 0;
+            draft.status = `Error uploading ${file.name}`;
+          });
           reject(error);
         },
         async () => {
           const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
           console.log("File available at:", downloadUrl);
-          setStatus((prevStatus) => ({
-            ...prevStatus,
-            [file.name]: `Uploaded ${file.name} successfully!`,
-          }));
+          setProcess((draft) => {
+            draft.value = 100;
+            draft.status = `Uploaded ${file.name} successfully!`;
+          });
           resolve(downloadUrl);
         }
       );
@@ -83,59 +68,18 @@ export const customFirebaseUploader = ({
     });
 };
 
-const CurrentFile = ({ url, label, cb }) => {
-  const [isInProgress, setIsInProgress] = useState(false);
-  const [text, setText] = useState(label || "");
-
-  return (
-    <Wrapper>
-      <InputText
-        value={text}
-        onChange={(e) => {
-          setText(e.target.value);
-        }}
-        onBlur={(e) => {
-          text !== e.target.value &&
-            cb({
-              action: "update",
-              label: e.target.value,
-              url,
-            });
-        }}
-      />
-      <textarea disabled defaultValue={url} />
-      {isInProgress && <>Deleting...</>}
-      <Button
-        label={"Delete"}
-        onClick={() => {
-          setIsInProgress(true);
-          deleteFile(url)
-            .then(() => {
-              cb({
-                url,
-                action: "delete",
-              });
-            })
-            .finally(() => {
-              setIsInProgress(false);
-            });
-        }}
-      />
-    </Wrapper>
-  );
-};
 const AdvancedFileUploader = ({ fileName, label, cb }) => {
-  const [progress, setProgress] = useState(0);
-  const [status, setStatus] = useState("");
   const [isInProgress, setIsInProgress] = useState(false);
   const [text, setText] = useState(label || "");
-
+  const [process, setProcess] = useImmer({
+    value: 0,
+    status: "",
+  });
   const upload = (event) => {
     setIsInProgress(true);
     customFirebaseUploader({
       event,
-      setProgress,
-      setStatus,
+      setProcess,
       cb: (downloadUrls) => {
         setIsInProgress(false);
         cb({
@@ -146,10 +90,7 @@ const AdvancedFileUploader = ({ fileName, label, cb }) => {
       fileName: `${fileName}_${text}`,
     });
   };
-  const progressItemValues = Object.values(progress);
-  const overallProgress =
-    progressItemValues.reduce((acc, curr) => acc + curr, 0) /
-    progressItemValues.length;
+  console.log(process);
   return (
     <>
       <Wrapper>
@@ -162,7 +103,7 @@ const AdvancedFileUploader = ({ fileName, label, cb }) => {
         <FileUpload
           name="file"
           accept="pdf/*"
-          maxFileSize={6000000} // Max 1 MB
+          maxFileSize={35000000}
           customUpload
           uploadHandler={upload}
           multiple
@@ -170,13 +111,14 @@ const AdvancedFileUploader = ({ fileName, label, cb }) => {
           uploadLabel={"Upload PDF"}
           chooseLabel={" "}
         />
-        <div className="loader">
-          {isInProgress && (
-            <ProgressBar value={overallProgress}>
-              <p>Status: {status}</p>
+        {isInProgress && (
+          <Loader>
+            <ProgressBar value={process.value || 30}>
+              <p>Status: {process.status}</p>
             </ProgressBar>
-          )}
-        </div>
+            <div>{`${process.value || 30}%`}</div>
+          </Loader>
+        )}
       </Wrapper>
     </>
   );
@@ -185,51 +127,23 @@ const AdvancedFileUploader = ({ fileName, label, cb }) => {
 const Wrapper = styled.div`
   display: flex;
   gap: 1rem;
+  flex-wrap: wrap;
+  position: relative;
 `;
-export default function ({ urls, fileName, cb }) {
-  const [urlsState, setUrlsState] = useState([]);
 
-  useEffect(() => {
-    setUrlsState(urls);
-  }, [urls]);
-
-  return (
-    <UrlsWrapper>
-      {urlsState.map(({ label, url }) =>
-        url ? (
-          <CurrentFile key={label + url} url={url} label={label} cb={cb} />
-        ) : (
-          <AdvancedFileUploader
-            key={label + url}
-            label={label}
-            fileName={`${fileName}_${urls?.length || 0}`}
-            cb={cb}
-          />
-        )
-      )}
-      <div className="buttons">
-        <Button
-          label={"+"}
-          onClick={() => {
-            setUrlsState((prevUrls) => [
-              ...prevUrls,
-              { label: "הצג", url: "" },
-            ]);
-          }}
-        />
-        <Button
-          label={"-"}
-          onClick={() => {
-            setUrlsState((prevUrls) => prevUrls.slice(0, -1));
-          }}
-        />
-      </div>
-    </UrlsWrapper>
-  );
-}
-
-const UrlsWrapper = styled.div`
+const Loader = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.5);
   display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
   flex-direction: column;
-  gap: 1rem;
+  pointer-events: none;
 `;
+
+export default AdvancedFileUploader;

@@ -1,4 +1,10 @@
 import { initializeApp } from "firebase/app";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup as signIn,
+  getRedirectResult as _getRedirectResult,
+} from "firebase/auth";
 import { getStorage } from "firebase/storage";
 
 const index = {
@@ -11,6 +17,17 @@ const index = {
   measurementId: process.env.REACT_APP_MEASUREMENT_ID, // Optional for Analytics
 };
 const app = initializeApp(index);
+
 const storage = getStorage(app);
 
-export { app, storage };
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+
+export const signInWithPopup = () => signIn(auth, provider);
+export const signInWithRedirect = () => signIn(auth, provider);
+export const signOut = () => auth.signOut();
+export const getRedirectResult = () => _getRedirectResult(auth);
+
+export const onAuthStateChanged = (callback) =>
+  auth.onAuthStateChanged(callback);
+export { app, storage, auth, provider };
