@@ -5,8 +5,16 @@
     .content {
       max-height: 250px;
       overflow-y: auto;
+
       direction: rtl;
       text-align: right;
+      ol{
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding-inline-start: 20px;
+        margin: 4px;
+      }
     }
   }
 }

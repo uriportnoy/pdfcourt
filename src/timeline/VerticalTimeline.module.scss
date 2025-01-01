@@ -42,7 +42,7 @@ $trd-party: #e0ceff;
   }
 
   .content {
-
+    font-weight: unset;
   }
 
   @mixin data-origin-styles($color) {
@@ -74,3 +74,4 @@ $trd-party: #e0ceff;
     @include data-origin-styles($trd-party);
   }
 }
+

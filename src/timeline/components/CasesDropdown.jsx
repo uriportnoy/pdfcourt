@@ -1,12 +1,17 @@
 import { useAppContext } from "../Context";
+import { addCase } from "../firebase/cases";
+import { useState } from "react";
 import Select from "react-select";
+import CreatableSelect from "react-select/creatable";
 
 export default function CasesDropdown({
   onChange,
   selectedCaseNumber,
   ...props
 }) {
-  const { cases: casesOptions } = useAppContext();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { cases: casesOptions, loadCases } = useAppContext();
   const dropdownOptions = casesOptions.map((item) => ({
     label: item.id,
     value: item,
@@ -15,15 +20,32 @@ export default function CasesDropdown({
   const currentOption = dropdownOptions
     ? dropdownOptions.find((op) => op.label === selectedCaseNumber)
     : null;
+
+  const handleCreate = (inputValue) => {
+    if (!inputValue || casesOptions.find((item) => item.id === inputValue)) {
+      return;
+    }
+    setIsLoading(true);
+    addCase({ id: inputValue }).finally(() => {
+      loadCases().then((_cases) => {
+        const curr = _cases.find((item) => item.id === inputValue);
+        curr && onChange(curr);
+        setIsLoading(false);
+      });
+    });
+  };
   return (
     <>
-      <Select
+      <CreatableSelect
         value={currentOption}
         onChange={(e) => {
           onChange(e?.value || null);
         }}
+        isLoading={isLoading}
         options={dropdownOptions}
         placeholder={"בחר תיק"}
+        onCreateOption={handleCreate}
+        isClearable
         {...props}
       />
     </>

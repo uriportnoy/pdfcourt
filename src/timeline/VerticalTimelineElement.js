@@ -89,7 +89,14 @@ const VerticalTimelineElement = ({
                   "vertical-timeline-element-date"
                 )}
               >
-                <span>{getDate(date)}</span>
+                <span
+                  style={{
+                    fontWeight: "bold",
+                    fontSize: "2em",
+                  }}
+                >
+                  {getDate(date)}
+                </span>
                 <span className={styles.caseNumber}>{caseNumber}</span>
                 {relatedCases && (
                   <div className={styles.relatedCases}>

@@ -1,4 +1,4 @@
-import "react-vertical-timeline-component/style.min.css";
+import "../style.css";
 import VerticalTimeline from "./VerticalTimeline";
 import VerticalTimelineElement from "./VerticalTimelineElement";
 import styles from "./styles.module.scss";
@@ -27,6 +27,7 @@ function TimelineApp() {
   const loadCases = useCallback(async () => {
     const _cases = await getAllCases();
     setCases(_cases);
+    return _cases;
   }, []);
 
   const loadGroups = useCallback(async () => {
@@ -37,42 +38,48 @@ function TimelineApp() {
 
   const filterTimelineData = (filterObj) => {
     if (!filterObj || Object.keys(filterObj).length === 0) {
-      return setTimelineData(allEvents);
+      return setTimelineData(allEvents); // Reset to all events when no filters are applied
     }
-    console.log(filterObj);
-    setTimelineData(
-      allEvents.filter((item) => {
-        return Object.entries(filterObj).every(([key, value]) => {
-          if (key === "text") {
-            if (!value || value.length <= 2) return true;
-            const {
-              title = "",
-              content = "",
-              caseNumber = "",
-              subTitle = "",
-            } = item;
-            return (
-              title.toLowerCase().includes(value.toLowerCase()) ||
-              content.toLowerCase().includes(value.toLowerCase()) ||
-              caseNumber.toLowerCase().includes(value.toLowerCase()) ||
-              subTitle.toLowerCase().includes(value.toLowerCase())
-            );
-          }
-          if (key === "groups" && item[key]) {
-            const kkk = Array.isArray(item[key]) ? item[key] : [item[key]];
-            const ids = kkk.map((group) =>
-              group.value?.value ? group.value?.value : group.value
-            );
-            return ids.includes(value);
-          }
-          return Array.isArray(item[key])
-            ? !!item[key].find((item) => item.value === value)
-            : item[key] === value;
-        });
-      })
-    );
-  };
 
+    const filteredData = allEvents.filter((item) => {
+      return Object.entries(filterObj).every(([key, value]) => {
+        if (key === "text") {
+          if (!value || value.length <= 2) return true;
+          const {
+            title = "",
+            content = "",
+            caseNumber = "",
+            subTitle = "",
+          } = item;
+          return (
+            title.toLowerCase().includes(value.toLowerCase()) ||
+            content.toLowerCase().includes(value.toLowerCase()) ||
+            caseNumber.toLowerCase().includes(value.toLowerCase()) ||
+            subTitle.toLowerCase().includes(value.toLowerCase())
+          );
+        }
+
+        if (key === "groups" && item[key]) {
+          const groupArray = Array.isArray(item[key]) ? item[key] : [item[key]];
+          return groupArray.some((group) => {
+            const groupValue =
+              group.value?.value?.value || group.value?.value || group.value;
+            return groupValue === value;
+          });
+        }
+
+        // Handle general array or scalar filtering
+        if (Array.isArray(item[key])) {
+          return item[key].some((innerItem) => innerItem.value === value);
+        }
+
+        return item[key] === value;
+      });
+    });
+
+    console.log(filteredData);
+    setTimelineData(filteredData);
+  };
   useEffect(() => {
     Promise.all([loadEvents(), loadCases(), loadGroups()]).then(() => {
       setIsLoaded(true);
@@ -85,7 +92,7 @@ function TimelineApp() {
   }
 
   return (
-    <Provider value={{ loadEvents, allEvents, cases, groups }}>
+    <Provider value={{ loadEvents, allEvents, cases, groups, loadCases }}>
       <div className={styles.app}>
         <TopBar filterTimelineData={filterTimelineData} />
         <VerticalTimeline>
