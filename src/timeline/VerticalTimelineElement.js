@@ -31,6 +31,7 @@ const VerticalTimelineElement = ({
     relatedCases,
     relatedEvent,
     relatedDates,
+    groups,
   } = item;
 
   return (
@@ -109,6 +110,13 @@ const VerticalTimelineElement = ({
                   <div className={styles.relatedCases}>
                     {relatedDates.map((_d) => (
                       <span key={`date_${_d}`}>{_d}</span>
+                    ))}
+                  </div>
+                )}
+                {groups && (
+                  <div className={styles.group}>
+                    {groups.map((_d, idx) => (
+                      <span key={`${idx}_${_d.label}`}>{_d.label}</span>
                     ))}
                   </div>
                 )}

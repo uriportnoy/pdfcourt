@@ -10,13 +10,13 @@ const MultiplePdfViewer = ({ fileURL }) => {
   }
   return (
     <Wrapper>
-      {fileURL.map((pdf, index) =>
-        isMobile ? (
+      {fileURL.map((pdf, index) => {
+        return isMobile ? (
           <PDFViewer key={index} fileURL={pdf} />
         ) : (
           <PDFObject key={index} {...pdf} />
-        )
-      )}
+        );
+      })}
     </Wrapper>
   );
 };

@@ -39,6 +39,17 @@ $trd-party: #e0ceff;
         color: #333;
       }
     }
+    .group{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-block: 5px;
+      span{
+        background: rgba(215, 243, 33, 0.56);
+        padding: 4px;
+        border-radius: 4px;
+      }
+    }
   }
 
   .content {
