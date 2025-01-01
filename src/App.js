@@ -1,25 +1,30 @@
-import logo from './logo.svg';
-import './App.css';
+import { default as PDFApp } from "./pdfCreator/App";
+import { default as TimelineApp } from "./timeline/App";
+import { useState } from "react";
 
+const PDF = "PDF";
+const TIMELINE = "Timeline";
 function App() {
+  const [selection, setSelection] = useState(TIMELINE);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+    <div>
+      <div>
+        <button
+          disabled={selection === PDF}
+          onClick={() => setSelection(TIMELINE)}
         >
-          Learn React
-        </a>
-      </header>
+          PDF
+        </button>
+        <button
+          disabled={selection === TIMELINE}
+          onClick={() => setSelection(TIMELINE)}
+        >
+          Timeline
+        </button>
+      </div>
+      {selection === PDF && <PDFApp />}
+      {selection === TIMELINE && <TimelineApp />}
     </div>
   );
 }
-
 export default App;

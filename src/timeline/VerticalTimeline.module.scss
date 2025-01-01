@@ -1,0 +1,51 @@
+$mine: #11a12d;
+$notMine: #F32163;
+$court: #d7c134;
+
+.wrapper {
+  .iconWrapper {
+    .icon {
+      color: #0e7490;
+      width: 100%;
+      height: 100%;
+      display: grid;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5em;
+    }
+  }
+
+  .dateClassName {
+    display: flex !important;
+    flex-direction: column;
+
+    :global(.caseNumber) {
+      color: gold;
+      background: #0e7490;
+    }
+  }
+.content{
+
+}
+  @mixin data-origin-styles($color) {
+    .iconWrapper {
+      background: $color;
+    }
+    .content {
+      background-color: $color;
+    }
+    .contentArrowStyle{
+      border-right: 7px solid $color;
+
+    }
+  }
+  &[data-origin="court"] {
+    @include data-origin-styles($court);
+  }
+  &[data-origin="mine"] {
+    @include data-origin-styles($mine);
+  }
+  &[data-origin="notMine"] {
+    @include data-origin-styles($notMine);
+  }
+}
