@@ -58,19 +58,35 @@ const CasesList = styled.div`
 function AddUpdateCase({ options, selectedCase }) {
   const [caseInfo, setCaseInfo] = useImmer({
     type: "",
-    id: "",
+    caseNumber: "",
     court: "",
     description: "",
     appealAccepted: false,
     isMyCase: false,
     isOpen: true,
   });
+  const [isLoading, setIsLoading] = useState();
   const isExistingCase = !!selectedCase?.id;
 
   useEffect(() => {
     selectedCase && setCaseInfo(selectedCase);
   }, [selectedCase]);
 
+  const apply = () => {
+    setIsLoading(true);
+    const _case = {
+      ...caseInfo,
+      status: caseInfo.status ? "פתוח" : "סגור",
+    };
+    const method = isExistingCase ? updateCase : addCase;
+    method(_case)
+      .then((t) => {
+        console.log(t);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
   return (
     <div className="flex-column mid-popup">
       <Dropdown
@@ -86,10 +102,10 @@ function AddUpdateCase({ options, selectedCase }) {
       />
       <InputMask
         id="ssn_input"
-        value={caseInfo.id}
+        value={caseInfo.caseNumber}
         onChange={(e) => {
           setCaseInfo((draft) => {
-            draft.id = e.value;
+            draft.caseNumber = e.value;
           });
         }}
         mask="99999-99-99"
@@ -194,16 +210,8 @@ function AddUpdateCase({ options, selectedCase }) {
       />
       <Button
         label={isExistingCase ? "Update" : "Add"}
-        onClick={() => {
-          const _case = {
-            ...caseInfo,
-            status: caseInfo.status ? "פתוח" : "סגור",
-          };
-          const method = isExistingCase ? updateCase : addCase;
-          method(_case).then((t) => {
-            console.log(t);
-          });
-        }}
+        onClick={apply}
+        loading={isLoading}
         // disabled={Object.values(caseInfo).some((val) => !val)}
       />
     </div>
@@ -230,20 +238,23 @@ function printCases(cases = []) {
 
   courtTypes.forEach((court) => {
     const courtCases = cases.filter((item) => item.court === court);
-    const hersCases = courtCases.filter((p) => !p.isMyCase);
-    const mineCases = courtCases.filter((p) => p.isMyCase);
-    const hersDeclined = hersCases.filter((it) => !it.appealAccepted);
-    const mineAccepted = mineCases.filter((it) => it.appealAccepted);
-    const mineDeclined = mineCases.filter((it) => !it.appealAccepted);
 
-    console.log("==========================================");
-    console.log(`${courtCases.length} תיקים ב${court}`);
-    console.log(`מתוכם ${hersCases.length} היא הגישה`);
-    console.log(`מתוכם ${hersDeclined.length} נדחו`);
-    console.log(`מתוכם ${mineCases.length} אני הגשתי`);
-    console.log(`מתוכם ${mineAccepted.length} התקבלו`);
-    console.log(`מתוכם ${mineDeclined.length} נדחו`);
+    const herCases = courtCases.filter((p) => !p.isMyCase);
+    const myCases = courtCases.filter((p) => p.isMyCase);
+
+    const herAccepted = herCases.filter((it) => it.appealAccepted);
+    const herDeclined = herCases.filter((it) => !it.appealAccepted);
+
+    const mineAccepted = myCases.filter((it) => it.appealAccepted);
+    const mineDeclined = myCases.filter((it) => !it.appealAccepted);
+
+    console.log("\u202B==========================================");
+    console.log(`\u202B${courtCases.length} תיקים ב${court}`);
+    console.log(
+      `\u202Bמתוכם ${herCases.length} היא הגישה, ${herAccepted.length} התקבלו, ${herDeclined.length} נדחו`
+    );
+    console.log(
+      `\u202Bמתוכם ${myCases.length} אני הגשתי, ${mineAccepted.length} התקבלו, ${mineDeclined.length} נדחו`
+    );
   });
-
-  console.log("==========================================");
 }

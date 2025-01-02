@@ -34,7 +34,7 @@ export async function update(collection_name, caseId, updatedData) {
 export async function add(collection_name, newItem) {
   try {
     const docRef = await addDoc(collection(db, collection_name), newItem);
-    console.log(`${collection_name}: id ${docRef.id} updated successfully.`);
+    console.log(`${collection_name}: id ${docRef.id} created successfully.`);
     return docRef.id;
   } catch (error) {
     console.error(`${collection_name}: Error creating item ${newItem}:`, error);

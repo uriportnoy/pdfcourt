@@ -1,6 +1,6 @@
 import { useAppContext } from "../Context";
 import { addCase } from "../firebase/cases";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Select from "react-select";
 import CreatableSelect from "react-select/creatable";
 
@@ -12,10 +12,15 @@ export default function CasesDropdown({
   const [isLoading, setIsLoading] = useState(false);
 
   const { cases: casesOptions, loadCases } = useAppContext();
-  const dropdownOptions = casesOptions.map((item) => ({
-    label: item.id,
-    value: item,
-  }));
+  const dropdownOptions = useMemo(
+    () =>
+      casesOptions.map((item) => ({
+        label: item.caseNumber,
+        value: item,
+      })),
+    [casesOptions]
+  );
+
   console.log("casesOptions:", dropdownOptions);
   const currentOption = dropdownOptions
     ? dropdownOptions.find((op) => op.label === selectedCaseNumber)
@@ -26,9 +31,18 @@ export default function CasesDropdown({
       return;
     }
     setIsLoading(true);
-    addCase({ id: inputValue }).finally(() => {
+    addCase({
+      caseNumber: inputValue,
+      type: "",
+      court: "",
+      description: "",
+      appealAccepted: false,
+      isMyCase: false,
+      isOpen: true,
+    }).then((id) => {
       loadCases().then((_cases) => {
-        const curr = _cases.find((item) => item.id === inputValue);
+        const curr = _cases.find((item) => item.id === id);
+        console.log(curr);
         curr && onChange(curr);
         setIsLoading(false);
       });
