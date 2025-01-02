@@ -11,14 +11,24 @@ import { useState } from "react";
 import styled from "styled-components";
 import { useImmer } from "use-immer";
 
+function getFileNameAndExtension(fileName) {
+  const regex = /^(.*)\.([^.]+)$/;
+  const match = fileName.match(regex);
+  if (match) {
+    return {
+      name: match[1].replaceAll(" ", "_"),
+      ext: match[2],
+    };
+  }
+  return null;
+}
 const customFirebaseUploader = ({
-  event,
+  files,
   setProcess,
   cb,
   fileName,
   folderName = "pdfs",
 }) => {
-  const files = event.files;
   const uploadPromises = files.map((file, index) => {
     return new Promise((resolve, reject) => {
       const storage = getStorage();
@@ -77,8 +87,10 @@ const AdvancedFileUploader = ({ fileName, label, cb }) => {
   });
   const upload = (event) => {
     setIsInProgress(true);
+    const files = event.files;
+    const { name, ext } = getFileNameAndExtension(files[0].name);
     customFirebaseUploader({
-      event,
+      files,
       setProcess,
       cb: (downloadUrls) => {
         setIsInProgress(false);
@@ -87,7 +99,8 @@ const AdvancedFileUploader = ({ fileName, label, cb }) => {
           url: downloadUrls[0],
         });
       },
-      fileName: `${fileName}_${text}`,
+      fileName: `${name}_${text}`,
+      folderName: ext === "pdf" ? "pdfs" : ext,
     });
   };
   console.log(process);

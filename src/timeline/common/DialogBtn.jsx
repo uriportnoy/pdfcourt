@@ -26,8 +26,13 @@ export default function DialogBtn({
       <Button
         label={title}
         onClick={() => {
-          setVisible(true);
-          onClick && onClick();
+          let preventShow = false;
+          if (onClick) {
+            preventShow = onClick()?.preventShow || false;
+          }
+          if (!preventShow) {
+            setVisible(true);
+          }
         }}
         className={btnClassName}
       />

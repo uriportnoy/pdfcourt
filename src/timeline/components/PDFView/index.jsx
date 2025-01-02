@@ -4,6 +4,7 @@ import React from "react";
 import styled from "styled-components";
 
 const MultiplePdfViewer = ({ fileURL }) => {
+  console.log("fileURL", fileURL);
   const isMobile = window.innerWidth < 700;
   if (!fileURL?.length) {
     return;
