@@ -107,6 +107,18 @@ const PDFViewer = ({ fileURL }) => {
     }
   };
 
+  const onClick = () => {
+    if (!url.includes("pdf")) {
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = url.split("/").pop();
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      return { preventShow: true };
+    }
+    loadPdfData({ newPage: 1 });
+  };
   const handleZoom = (zoomIn = true) => {
     const newScale = zoomIn
       ? Math.min(scale + 0.2, 3)
@@ -131,9 +143,7 @@ const PDFViewer = ({ fileURL }) => {
       title={label}
       dialogClassName={styles.dialogPdf}
       header={label}
-      onClick={() => {
-        loadPdfData({ newPage: 1 });
-      }}
+      onClick={onClick}
       onClose={() => {
         setCurrentPage(null);
         setPdfFile(null);
@@ -182,6 +192,7 @@ const PDFViewer = ({ fileURL }) => {
     </DialogBtn>
   );
 };
+
 const CanvasContainer = styled.div`
   max-height: 65vh;
   overflow: auto;

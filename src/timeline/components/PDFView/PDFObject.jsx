@@ -14,7 +14,6 @@ const PDFObject = ({ label, url }) => {
       return { preventShow: true };
     }
   };
-  console.log(url);
 
   return (
     <DialogBtn
