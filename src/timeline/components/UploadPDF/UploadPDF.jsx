@@ -129,7 +129,7 @@ const AdvancedFileUploader = ({ fileName, label, cb }) => {
             <ProgressBar value={process.value || 30}>
               <p>Status: {process.status}</p>
             </ProgressBar>
-            <div>{`${process.value || 30}%`}</div>
+            <div>{`${process.value ?? 0}%`}</div>
           </Loader>
         )}
       </Wrapper>

@@ -9,7 +9,6 @@ import {
   orderBy,
   query,
   updateDoc,
-  writeBatch,
 } from "firebase/firestore";
 import {
   deleteObject,
@@ -88,39 +87,3 @@ export const uploadFile = async (event) => {
     return null;
   }
 };
-
-// export const updateDocuments = async () => {
-//   const collectionName = "events"; // Replace with your collection name
-//   const snapshot = await getDocs(collection(db, collectionName));
-//
-//   const batch = writeBatch(db);
-//
-//   snapshot.forEach((docSnap) => {
-//     const data = docSnap.data();
-//     let newFileUrls;
-//     if (!data.fileURL) {
-//       newFileUrls = [];
-//     }
-//     if (Array.isArray(data.fileURL)) {
-//       newFileUrls = data.fileURL.map((url) => ({
-//         label: "הצג",
-//         url,
-//       }));
-//     } else if (typeof data.fileURL === "string") {
-//       newFileUrls = [
-//         {
-//           label: "הצג",
-//           url: data.fileURL,
-//         },
-//       ];
-//     }
-//     batch.update(doc(db, collectionName, docSnap.id), {
-//       fileURL: newFileUrls,
-//     });
-//   });
-//
-//   await batch.commit();
-//   console.log("Documents updated successfully!");
-// };
-//
-// window.updateDocuments = updateDocuments;

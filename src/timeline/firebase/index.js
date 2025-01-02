@@ -6,6 +6,7 @@ import {
   getRedirectResult as _getRedirectResult,
 } from "firebase/auth";
 import { getStorage } from "firebase/storage";
+import "./migration";
 
 const index = {
   apiKey: process.env.REACT_APP_API_KEY,
