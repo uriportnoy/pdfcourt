@@ -4,6 +4,15 @@ import { useMemo, useState } from "react";
 import Select from "react-select";
 import CreatableSelect from "react-select/creatable";
 
+const colourStyles = {
+  option: (styles, { data }) => {
+    return {
+      ...styles,
+      backgroundColor: data.value.isMyCase ? undefined : "#ffa7975c",
+    };
+  },
+};
+
 export default function CasesDropdown({
   onChange,
   selectedCaseNumber,
@@ -15,13 +24,12 @@ export default function CasesDropdown({
   const dropdownOptions = useMemo(
     () =>
       casesOptions.map((item) => ({
-        label: item.caseNumber,
+        label: `(${item.court}) ${item.caseNumber}`,
         value: item,
       })),
     [casesOptions]
   );
 
-  console.log("casesOptions:", dropdownOptions);
   const currentOption = dropdownOptions
     ? dropdownOptions.find((op) => op.label === selectedCaseNumber)
     : null;
@@ -60,6 +68,7 @@ export default function CasesDropdown({
         placeholder={"בחר תיק"}
         onCreateOption={handleCreate}
         isClearable
+        styles={colourStyles}
         {...props}
       />
     </>

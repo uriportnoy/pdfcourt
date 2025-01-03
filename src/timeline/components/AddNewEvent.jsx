@@ -51,7 +51,6 @@ export const FormDialog = ({ eventData = {}, close }) => {
     ...eventData,
   });
   const { loadEvents, cases: options, groups } = useAppContext();
-  const [text, setText] = useState("");
 
   console.log("state", state);
   const addNewEvent = async () => {
@@ -171,22 +170,6 @@ export const FormDialog = ({ eventData = {}, close }) => {
           dateFormat="dd/mm/yy"
         />
       </LabelWrapper>
-      {/*<LabelWrapper title={"תאריכים קשורים"}>*/}
-      {/*  <Calendar*/}
-      {/*    value={state.relatedDates.map((date) => new Date(date))}*/}
-      {/*    onChange={(e) => {*/}
-      {/*      setState((draft) => {*/}
-      {/*        const pickedDates = e.value || [];*/}
-      {/*        draft.relatedDates = pickedDates.map((_date) =>*/}
-      {/*          _date.toLocaleDateString("en-CA")*/}
-      {/*        );*/}
-      {/*      });*/}
-      {/*    }}*/}
-      {/*    dateFormat="dd/mm/yy"*/}
-      {/*    selectionMode="multiple"*/}
-      {/*    readOnlyInput*/}
-      {/*  />*/}
-      {/*</LabelWrapper>*/}
       <LabelWrapper title={"קבוצה"}>
         <MultipleSelect
           options={groups}

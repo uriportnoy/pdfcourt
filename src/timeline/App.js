@@ -32,7 +32,6 @@ function TimelineApp() {
 
   const loadGroups = useCallback(async () => {
     const _groups = await getAll("groups");
-    console.log("groups:", _groups);
     setGroups(_groups);
   }, []);
 

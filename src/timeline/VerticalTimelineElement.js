@@ -26,12 +26,12 @@ const VerticalTimelineElement = ({
     id,
     type,
     date,
-    caseNumber,
     fileURL,
     relatedCases,
     relatedEvent,
     relatedDates,
     groups,
+    selectedCase,
   } = item;
 
   return (
@@ -98,7 +98,9 @@ const VerticalTimelineElement = ({
                 >
                   {getDate(date)}
                 </span>
-                <span className={styles.caseNumber}>{caseNumber}</span>
+                <span className={styles.caseNumber}>
+                  {selectedCase.type} {selectedCase.caseNumber}
+                </span>
                 {relatedCases && (
                   <div className={styles.relatedCases}>
                     {relatedCases.map((item) => (
