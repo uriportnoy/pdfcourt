@@ -10,6 +10,7 @@ import TopBar from "./components/TopBar";
 import { getAllCases } from "./firebase/cases";
 import { getAll } from "./firebase/crud";
 import { getEvents } from "./firebase/events";
+import { useImmer } from "use-immer";
 
 function TimelineApp() {
   const [allEvents, setAllEvents] = useState([]);
@@ -17,31 +18,15 @@ function TimelineApp() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [cases, setCases] = useState([]);
   const [groups, setGroups] = useState([]);
+  const [filters, setFilters] = useImmer({});
 
-  const loadEvents = useCallback(async () => {
-    const _events = await getEvents();
-    setAllEvents(_events);
-    setTimelineData(_events);
-  }, []);
-
-  const loadCases = useCallback(async () => {
-    const _cases = await getAllCases();
-    setCases(_cases);
-    return _cases;
-  }, []);
-
-  const loadGroups = useCallback(async () => {
-    const _groups = await getAll("groups");
-    setGroups(_groups);
-  }, []);
-
-  const filterTimelineData = (filterObj) => {
-    if (!filterObj || Object.keys(filterObj).length === 0) {
+  const filterTimelineData = useCallback(() => {
+    if (!filters || Object.keys(filters).length === 0) {
       return setTimelineData(allEvents); // Reset to all events when no filters are applied
     }
-
+    console.log(filters);
     const filteredData = allEvents.filter((item) => {
-      return Object.entries(filterObj).every(([key, value]) => {
+      return Object.entries(filters).every(([key, value]) => {
         if (key === "text") {
           if (!value || value.length <= 2) return true;
           const {
@@ -75,10 +60,31 @@ function TimelineApp() {
         return item[key] === value;
       });
     });
-
-    console.log(filteredData);
+    console.log("filteredData: ", filteredData);
     setTimelineData(filteredData);
-  };
+  }, [setTimelineData, filters, allEvents]);
+
+  const loadEvents = useCallback(async () => {
+    const _events = await getEvents();
+    setAllEvents(_events);
+    filterTimelineData();
+  }, [filterTimelineData]);
+
+  const loadCases = useCallback(async () => {
+    const _cases = await getAllCases();
+    setCases(_cases);
+    return _cases;
+  }, []);
+
+  const loadGroups = useCallback(async () => {
+    const _groups = await getAll("groups");
+    setGroups(_groups);
+  }, []);
+
+  useEffect(() => {
+    filterTimelineData();
+  }, [filterTimelineData]);
+
   useEffect(() => {
     Promise.all([loadEvents(), loadCases(), loadGroups()]).then(() => {
       setIsLoaded(true);
@@ -93,7 +99,7 @@ function TimelineApp() {
   return (
     <Provider value={{ loadEvents, allEvents, cases, groups, loadCases }}>
       <div className={styles.app}>
-        <TopBar filterTimelineData={filterTimelineData} />
+        <TopBar filters={filters} setFilters={setFilters} />
         <VerticalTimeline>
           {timelineData.map((item) => {
             return (

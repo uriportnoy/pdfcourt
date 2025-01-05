@@ -16,10 +16,11 @@ const colourStyles = {
 export default function CasesDropdown({
   onChange,
   selectedCaseNumber,
+  isCreatable,
   ...props
 }) {
   const [isLoading, setIsLoading] = useState(false);
-
+  const Component = isCreatable ? CreatableSelect : Select;
   const { cases: casesOptions, loadCases } = useAppContext();
   const dropdownOptions = useMemo(
     () =>
@@ -31,7 +32,7 @@ export default function CasesDropdown({
   );
 
   const currentOption = dropdownOptions
-    ? dropdownOptions.find((op) => op.label === selectedCaseNumber)
+    ? dropdownOptions.find((op) => op.value.caseNumber === selectedCaseNumber)
     : null;
 
   const handleCreate = (inputValue) => {
@@ -58,7 +59,7 @@ export default function CasesDropdown({
   };
   return (
     <>
-      <CreatableSelect
+      <Component
         value={currentOption}
         onChange={(e) => {
           onChange(e?.value || null);
@@ -66,7 +67,7 @@ export default function CasesDropdown({
         isLoading={isLoading}
         options={dropdownOptions}
         placeholder={"בחר תיק"}
-        onCreateOption={handleCreate}
+        onCreateOption={isCreatable ? handleCreate : () => null}
         isClearable
         styles={colourStyles}
         {...props}

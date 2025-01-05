@@ -6,16 +6,10 @@ import AddNewCase from "./AddNewCase";
 import AddNewEvent from "./AddNewEvent";
 import CasesDropdown, { SimpleDropdown } from "./CasesDropdown";
 import { InputText } from "primereact/inputtext";
-import { useEffect, useState } from "react";
-import { useImmer } from "use-immer";
+import { useState } from "react";
 
-export default function TopBar({ filterTimelineData }) {
-  const [filters, setFilters] = useImmer({});
+export default function TopBar({ filters, setFilters }) {
   const { loadEvents, groups } = useAppContext();
-
-  useEffect(() => {
-    filterTimelineData(filters);
-  }, [filters]);
 
   const onSetFilters = (key, val) => {
     setFilters((draft) => {
@@ -38,12 +32,13 @@ export default function TopBar({ filterTimelineData }) {
               delete draft.caseNumber;
               return;
             }
-            draft.caseNumber = selectedCase.id;
+            draft.caseNumber = selectedCase.caseNumber;
           });
         }}
         className={styles.casesSelect}
         isClearable
         placeholder={"סינון לפי תיק"}
+        isCreatable={false}
       />
       <SimpleDropdown
         options={groups}

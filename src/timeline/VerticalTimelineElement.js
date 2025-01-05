@@ -32,6 +32,7 @@ const VerticalTimelineElement = ({
     relatedDates,
     groups,
     selectedCase,
+    caseNumber,
   } = item;
 
   return (
@@ -99,7 +100,7 @@ const VerticalTimelineElement = ({
                   {getDate(date)}
                 </span>
                 <span className={styles.caseNumber}>
-                  {selectedCase.type} {selectedCase.caseNumber}
+                  {selectedCase.type} {caseNumber}
                 </span>
                 {relatedCases && (
                   <div className={styles.relatedCases}>

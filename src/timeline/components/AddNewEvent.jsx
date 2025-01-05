@@ -55,10 +55,7 @@ export const FormDialog = ({ eventData = {}, close }) => {
   console.log("state", state);
   const addNewEvent = async () => {
     setIsLoading(true);
-    addEvent({
-      ...state,
-      caseNumber: state.selectedCase.id,
-    })
+    addEvent(state)
       .then((createdId) => {
         console.log(createdId);
         setState((draft) => {
@@ -75,10 +72,7 @@ export const FormDialog = ({ eventData = {}, close }) => {
   const updateEventData = async () => {
     console.log("updateEventData:", state);
     setIsLoading(true);
-    updateEvent({
-      ...state,
-      caseNumber: state.selectedCase.id,
-    })
+    updateEvent(state)
       .then(() => {
         loadEvents();
         close();
@@ -111,15 +105,16 @@ export const FormDialog = ({ eventData = {}, close }) => {
       updateEvent({ fileURL: currentFiles, id: state.id });
     }
   };
-
   return (
     <div className={styles.formWrapper}>
       <LabelWrapper title="תיק">
         <CasesDropdown
-          selectedCaseNumber={state.selectedCase?.id}
+          selectedCaseNumber={state.selectedCase?.caseNumber}
           onChange={(selectedCase) => {
             setState((draft) => {
+              console.log(selectedCase);
               draft.selectedCase = selectedCase;
+              draft.caseNumber = selectedCase.caseNumber;
             });
           }}
         />
