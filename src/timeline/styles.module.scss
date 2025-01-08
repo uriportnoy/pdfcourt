@@ -24,7 +24,7 @@
   flex-direction: column;
   gap: 8px;
 
-  label {
+  .labelWrapper {
     display: grid;
     grid-template-columns: 1fr 5fr;
     align-items: center;

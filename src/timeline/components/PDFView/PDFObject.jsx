@@ -2,7 +2,7 @@ import DialogBtn from "../../common/DialogBtn";
 import styles from "../../styles.module.scss";
 import React from "react";
 
-const PDFObject = ({ label, url }) => {
+const PDFObject = ({ label, url, type }) => {
   const onClick = () => {
     if (!url.includes("pdf")) {
       const link = document.createElement("a");
@@ -20,6 +20,7 @@ const PDFObject = ({ label, url }) => {
       title={label}
       dialogClassName={styles.dialogPdf}
       onClick={onClick}
+      type={type}
     >
       <File url={url} />
     </DialogBtn>

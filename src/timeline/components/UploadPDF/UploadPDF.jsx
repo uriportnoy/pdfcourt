@@ -10,6 +10,8 @@ import { ProgressBar } from "primereact/progressbar";
 import { useState } from "react";
 import styled from "styled-components";
 import { useImmer } from "use-immer";
+import { SimpleDropdown } from "../CasesDropdown";
+import { origins } from "../../common/common";
 
 function getFileNameAndExtension(fileName) {
   const regex = /^(.*)\.([^.]+)$/;
@@ -40,7 +42,7 @@ const customFirebaseUploader = ({
         "state_changed",
         (snapshot) => {
           const currentProgress = Math.round(
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100,
           );
 
           setProcess((draft) => {
@@ -64,7 +66,7 @@ const customFirebaseUploader = ({
             draft.status = `Uploaded ${file.name} successfully!`;
           });
           resolve(downloadUrl);
-        }
+        },
       );
     });
   });
@@ -78,9 +80,15 @@ const customFirebaseUploader = ({
     });
 };
 
-const AdvancedFileUploader = ({ fileName, label, cb }) => {
+const AdvancedFileUploader = ({
+  fileName,
+  label,
+  cb,
+  type: _type = origins[0],
+}) => {
   const [isInProgress, setIsInProgress] = useState(false);
-  const [text, setText] = useState(label || "");
+  const [text, setText] = useState("");
+  const [type, setType] = useState(_type);
   const [process, setProcess] = useImmer({
     value: 0,
     status: "",
@@ -95,8 +103,9 @@ const AdvancedFileUploader = ({ fileName, label, cb }) => {
       cb: (downloadUrls) => {
         setIsInProgress(false);
         cb({
-          label: text,
+          label: text || "הצג",
           url: downloadUrls[0],
+          type,
         });
       },
       fileName: `${name}_${text}`,
@@ -112,6 +121,16 @@ const AdvancedFileUploader = ({ fileName, label, cb }) => {
           onChange={(e) => {
             setText(e.target.value);
           }}
+          placeholder={"הצג"}
+        />
+        <SimpleDropdown
+          options={origins}
+          value={type}
+          onChange={(_type) => {
+            setType(_type);
+          }}
+          placeholder={"גורם"}
+          isClearable={false}
         />
         <FileUpload
           name="file"

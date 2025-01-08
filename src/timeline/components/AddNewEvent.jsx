@@ -86,7 +86,7 @@ export const FormDialog = ({ eventData = {}, close }) => {
     let currentFiles = [...state.fileURL];
     if (action === "delete") {
       currentFiles = currentFiles.filter(
-        (file) => file.url !== downloadUrls.url
+        (file) => file.url !== downloadUrls.url,
       );
     } else if (action === "update") {
       currentFiles = currentFiles.map((file) => {
@@ -246,10 +246,10 @@ export const FormDialog = ({ eventData = {}, close }) => {
 
 function LabelWrapper({ children, title }) {
   return (
-    <label>
+    <div className={styles.labelWrapper}>
       <span>{title}</span>
       {cloneElement(children, { placeholder: title })}
-    </label>
+    </div>
   );
 }
 

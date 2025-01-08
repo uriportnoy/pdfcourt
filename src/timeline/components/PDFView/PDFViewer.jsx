@@ -13,7 +13,7 @@ import "pdfjs-dist/web/pdf_viewer.css";
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 const PDFViewer = ({ fileURL }) => {
-  const { label, url } = fileURL;
+  const { label, url, type } = fileURL;
   const wrapperRef = useRef(null);
   const containerRef = useRef(null);
   const [multiplePages, setMultiplePages] = useState(false);
@@ -50,7 +50,7 @@ const PDFViewer = ({ fileURL }) => {
         if (containerRef.current) {
           containerRef.current.innerHTML = "";
           pageCanvases.forEach(({ canvas }) =>
-            containerRef.current.appendChild(canvas)
+            containerRef.current.appendChild(canvas),
           );
         }
         if (wrapperRef.current) {
@@ -61,7 +61,7 @@ const PDFViewer = ({ fileURL }) => {
         console.error("Error loading PDF:", error);
       }
     },
-    [getPDF]
+    [getPDF],
   );
 
   const loadPDF = useCallback(
@@ -86,7 +86,7 @@ const PDFViewer = ({ fileURL }) => {
         console.error("Error loading PDF:", error);
       }
     },
-    [getPDF]
+    [getPDF],
   );
 
   const loadPdfData = ({ newPage, _scale = scale, multipleDirect = false }) => {
@@ -148,6 +148,7 @@ const PDFViewer = ({ fileURL }) => {
         setCurrentPage(null);
         setPdfFile(null);
       }}
+      type={type}
     >
       {isLoading && <Center type="overlay">Loading...</Center>}
       <HiddenOnLoading data-is-loading={isLoading}>

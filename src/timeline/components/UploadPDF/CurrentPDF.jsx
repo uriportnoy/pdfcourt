@@ -3,6 +3,8 @@ import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { useState } from "react";
 import styled from "styled-components";
+import { origins } from "../../common/common";
+import { SimpleDropdown } from "../CasesDropdown";
 
 const deleteFile = async (url) => {
   try {
@@ -14,9 +16,10 @@ const deleteFile = async (url) => {
     return null;
   }
 };
-const CurrentFile = ({ url, label, cb }) => {
+const CurrentFile = ({ url, type, label, cb }) => {
   const [isInProgress, setIsInProgress] = useState(false);
   const [text, setText] = useState(label || "");
+  const [_type, setType] = useState(type);
 
   return (
     <Wrapper>
@@ -33,6 +36,23 @@ const CurrentFile = ({ url, label, cb }) => {
               url,
             });
         }}
+      />
+      <SimpleDropdown
+        options={origins}
+        value={_type}
+        onChange={(_t) => {
+          setType(_t);
+          if (_t !== type) {
+            cb({
+              action: "update",
+              label: text,
+              url,
+              type: _t,
+            });
+          }
+        }}
+        placeholder={"גורם"}
+        isClearable={false}
       />
       <textarea disabled defaultValue={url} />
       {isInProgress && <>Deleting...</>}

@@ -13,17 +13,24 @@ function PDFUploader({ urls, fileName, cb }) {
 
   return (
     <UrlsWrapper>
-      {urlsState.map(({ label, url }) =>
+      {urlsState.map(({ label, url, type }) =>
         url ? (
-          <CurrentFile key={label + url} url={url} label={label} cb={cb} />
+          <CurrentFile
+            key={label + url}
+            url={url}
+            label={label}
+            cb={cb}
+            type={type}
+          />
         ) : (
           <AdvancedFileUploader
             key={label + url}
             label={label}
             fileName={`${fileName}_${urls?.length || 0}`}
+            type={type}
             cb={cb}
           />
-        )
+        ),
       )}
       <div className="buttons">
         <Button

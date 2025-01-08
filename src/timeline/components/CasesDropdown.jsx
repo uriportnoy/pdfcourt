@@ -28,7 +28,7 @@ export default function CasesDropdown({
         label: `(${item.court}) ${item.caseNumber}`,
         value: item,
       })),
-    [casesOptions]
+    [casesOptions],
   );
 
   const currentOption = dropdownOptions
@@ -88,7 +88,10 @@ export const SimpleDropdown = ({
     label: labelKey ? item[labelKey] : item,
     value: valKey ? item[valKey] : item,
   }));
-  const currentOption = value ? _options.find((op) => op === value) : null;
+  const currentOption = value
+    ? _options.find((op) => (op.value || op) === value)
+    : null;
+
   return (
     <Select
       value={currentOption}
