@@ -61,10 +61,23 @@ export const updateEvent = async (eventData) => {
 export const deleteEvent = async (event) => {
   try {
     const { id: eventId, fileURL } = event;
-    if (fileURL?.length > 0) {
+    if (Array.isArray(fileURL) && fileURL.length > 0) {
       const storage = getStorage();
-      const fileRefs = fileURL.map((url) => ref(storage, url));
-      await Promise.all(fileRefs.map((fileRef) => deleteObject(fileRef)));
+      const fileRefs = fileURL.map(({ url }) => ref(storage, url));
+      await Promise.all(
+        fileRefs.map(async (fileRef) => {
+          try {
+            await getDownloadURL(fileRef); // Check if the file exists
+            await deleteObject(fileRef); // Delete the file if it exists
+          } catch (error) {
+            if (error.code === "storage/object-not-found") {
+              console.warn(`File not found: ${fileRef.fullPath}`);
+            } else {
+              console.error("Error checking file existence:", error);
+            }
+          }
+        }),
+      );
     }
     const eventRef = doc(db, "events", eventId);
     await deleteDoc(eventRef);
