@@ -34,10 +34,13 @@ export const getEvents = async () => {
   try {
     const q = query(collection(db, "events"), orderBy("date"));
     const querySnapshot = await getDocs(q);
-
+    console.log(
+      "Query Snapshot:",
+      querySnapshot.docs.map((t) => t.data())
+    );
     const events = querySnapshot.docs.map((doc) => ({
-      id: doc.id,
       ...doc.data(),
+      id: doc.id,
     }));
 
     console.log("Ordered Events:", events);
@@ -76,7 +79,7 @@ export const deleteEvent = async (event) => {
               console.error("Error checking file existence:", error);
             }
           }
-        }),
+        })
       );
     }
     const eventRef = doc(db, "events", eventId);

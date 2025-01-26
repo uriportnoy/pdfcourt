@@ -36,7 +36,6 @@ const defaultState = {
   date: null,
   title: "",
   subtitle: "",
-  description: "",
   content: "",
   fileURL: [],
   relatedCases: [],
@@ -55,6 +54,7 @@ export const FormDialog = ({ eventData = {}, close }) => {
   console.log("state", state);
   const addNewEvent = async () => {
     setIsLoading(true);
+    console.log("addNewEvent:", state);
     addEvent(state)
       .then((createdId) => {
         console.log(createdId);
@@ -86,7 +86,7 @@ export const FormDialog = ({ eventData = {}, close }) => {
     let currentFiles = [...state.fileURL];
     if (action === "delete") {
       currentFiles = currentFiles.filter(
-        (file) => file.url !== downloadUrls.url,
+        (file) => file.url !== downloadUrls.url
       );
     } else if (action === "update") {
       currentFiles = currentFiles.map((file) => {
@@ -239,6 +239,19 @@ export const FormDialog = ({ eventData = {}, close }) => {
           }
           loading={isLoading}
         />
+        {isEditMode && (
+          <Button
+            label={"שכפל"}
+            outlined
+            onClick={() => {
+              setState((draft) => {
+                delete draft.id;
+                draft.fileURL = [];
+                draft.content = "";
+              });
+            }}
+          />
+        )}
       </BottomBar>
     </div>
   );
@@ -269,4 +282,6 @@ const BottomBar = styled.div`
   width: 100%;
   background-color: white;
   padding: 1rem;
+  gap: 8px;
+  display: flex;
 `;

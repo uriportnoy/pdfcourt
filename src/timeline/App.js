@@ -103,7 +103,7 @@ function TimelineApp() {
         <VerticalTimeline>
           {timelineData.map((item) => {
             return (
-              <VerticalTimelineElement key={item.title + item.date} item={item}>
+              <VerticalTimelineElement key={item.title + item.id} item={item}>
                 <div className={styles.contentWrapper}>
                   <h3 className="vertical-timeline-element-title">
                     {item.title}
