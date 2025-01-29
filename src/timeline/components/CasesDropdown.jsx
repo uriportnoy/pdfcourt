@@ -6,9 +6,13 @@ import CreatableSelect from "react-select/creatable";
 
 const colourStyles = {
   option: (styles, { data }) => {
+    const { isMyCase, isOpen } = data?.value || {};
     return {
       ...styles,
-      backgroundColor: data.value.isMyCase ? undefined : "#ffa7975c",
+      color: isOpen ? "#333" : "#0000005e",
+      background: isMyCase
+        ? "#62ea005c"
+        : "repeating-linear-gradient( 45deg, #ff1f1f26, transparent 10px, transparent 10px, transparent 20px ), linear-gradient( to bottom, transparent, transparent )",
     };
   },
 };
@@ -28,7 +32,7 @@ export default function CasesDropdown({
         label: `(${item.court}) ${item.caseNumber}`,
         value: item,
       })),
-    [casesOptions],
+    [casesOptions]
   );
 
   const currentOption = dropdownOptions
@@ -57,6 +61,7 @@ export default function CasesDropdown({
       });
     });
   };
+  console.log(dropdownOptions);
   return (
     <>
       <Component
