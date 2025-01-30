@@ -17,7 +17,7 @@ import { cloneElement, useState } from "react";
 import styled from "styled-components";
 import { useImmer } from "use-immer";
 
-export default function AddNewEvent({ btnClassName }) {
+export default function AddNewEvent({ btnClassName, caseNumber }) {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <DialogBtn
@@ -26,7 +26,7 @@ export default function AddNewEvent({ btnClassName }) {
       isOpen={isOpen}
       header={"יצירת אירוע חדש"}
     >
-      <FormDialog close={() => setIsOpen(false)} />
+      <FormDialog close={() => setIsOpen(false)} eventData={{ caseNumber }} />
     </DialogBtn>
   );
 }
@@ -109,7 +109,9 @@ export const FormDialog = ({ eventData = {}, close }) => {
     <div className={styles.formWrapper}>
       <LabelWrapper title="תיק">
         <CasesDropdown
-          selectedCaseNumber={state.selectedCase?.caseNumber}
+          selectedCaseNumber={
+            state.selectedCase?.caseNumber || eventData.caseNumber
+          }
           onChange={(selectedCase) => {
             setState((draft) => {
               console.log(selectedCase);

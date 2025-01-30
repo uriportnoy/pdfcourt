@@ -41,6 +41,7 @@ export default function ({ label = "+" }) {
           className={styles.casesSelect}
           isClearable
           placeholder={"תיק קיים"}
+          isCreatable
         />
         <AddUpdateCase options={options} selectedCase={selectedCase} />
       </CasesList>

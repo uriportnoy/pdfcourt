@@ -12,7 +12,7 @@ const colourStyles = {
       color: isOpen ? "#333" : "#0000005e",
       background: isMyCase
         ? "#62ea005c"
-        : "repeating-linear-gradient( 45deg, #ff1f1f26, transparent 10px, transparent 10px, transparent 20px ), linear-gradient( to bottom, transparent, transparent )",
+        : "repeating-linear-gradient(90deg, #ff1f1f26, transparent 10px, transparent 10px, #ff1f1f26 20px ), linear-gradient( to bottom, transparent, transparent )",
     };
   },
 };

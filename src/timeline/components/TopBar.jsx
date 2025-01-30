@@ -23,7 +23,11 @@ export default function TopBar({ filters, setFilters }) {
 
   return (
     <div className={styles.topbar}>
-      <AddNewEvent loadEvents={loadEvents} btnClassName={styles.btn} />
+      <AddNewEvent
+        loadEvents={loadEvents}
+        btnClassName={styles.btn}
+        caseNumber={filters.caseNumber}
+      />
       <CasesDropdown
         selectedCaseNumber={filters.caseNumber}
         onChange={(selectedCase) => {
