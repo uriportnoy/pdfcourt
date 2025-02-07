@@ -5,6 +5,7 @@ import styles from "../styles.module.scss";
 import AddNewCase from "./AddNewCase";
 import AddNewEvent from "./AddNewEvent";
 import CasesDropdown, { SimpleDropdown } from "./CasesDropdown";
+import get from "lodash/get";
 import { InputText } from "primereact/inputtext";
 import { useState } from "react";
 
@@ -43,6 +44,14 @@ export default function TopBar({ filters, setFilters }) {
         isClearable
         placeholder={"סינון לפי תיק"}
         isCreatable={false}
+      />
+      <SimpleDropdown
+        options={["שלום", "מחוזי", "העליון"]}
+        value={get(filters, "selectedCase.court")}
+        placeholder={"סינון לפי ערכאה"}
+        onChange={(court) => {
+          onSetFilters("selectedCase.court", court);
+        }}
       />
       <SimpleDropdown
         options={groups}

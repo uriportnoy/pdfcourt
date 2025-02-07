@@ -254,6 +254,7 @@ function printCases(cases = []) {
     console.log(
       `\u202Bמתוכם ${herCases.length} היא הגישה, ${herAccepted.length} התקבלו, ${herDeclined.length} נדחו`
     );
+    console.log("נדחו", herDeclined.map((it) => it.caseNumber).join(", "));
     console.log(
       `\u202Bמתוכם ${myCases.length} אני הגשתי, ${mineAccepted.length} התקבלו, ${mineDeclined.length} נדחו`
     );

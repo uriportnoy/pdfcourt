@@ -10,6 +10,7 @@ import TopBar from "./components/TopBar";
 import { getAllCases } from "./firebase/cases";
 import { getAll } from "./firebase/crud";
 import { getEvents } from "./firebase/events";
+import get from "lodash/get";
 import { useImmer } from "use-immer";
 
 function TimelineApp() {
@@ -51,13 +52,13 @@ function TimelineApp() {
             return groupValue === value;
           });
         }
-
+        const itemValue = get(item, key);
         // Handle general array or scalar filtering
-        if (Array.isArray(item[key])) {
-          return item[key].some((innerItem) => innerItem.value === value);
+        if (Array.isArray(itemValue)) {
+          return itemValue.some((innerItem) => innerItem.value === value);
         }
 
-        return item[key] === value;
+        return itemValue === value;
       });
     });
     console.log("filteredData: ", filteredData);
