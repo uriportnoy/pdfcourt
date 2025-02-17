@@ -8,8 +8,9 @@ import {
 } from "./timeline/firebase";
 import { Toast } from "primereact/toast";
 import { cloneElement, useEffect, useRef, useState } from "react";
+import LoginForm from "./Login.tsx";
 
-const ALLOW_USER = "uriportnoy@gmail.com";
+const ALLOW_USERS = ["uriportnoy@gmail.com", "uri.portnoy@duda.co"];
 
 const isMobile = () => {
   return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -33,7 +34,7 @@ function AppWithLogin({ children }) {
     const unsubscribe = onAuthStateChanged((currentUser) => {
       if (currentUser) {
         setUser(currentUser);
-        setHasAccess(currentUser.email === ALLOW_USER);
+        setHasAccess(ALLOW_USERS.includes(currentUser.email));
       }
     });
     const handleRedirectResult = async () => {
@@ -42,7 +43,7 @@ function AppWithLogin({ children }) {
         if (result) {
           const currentUser = result.user;
           setUser(currentUser);
-          const userHasAccess = currentUser.email === ALLOW_USER;
+          const userHasAccess =  ALLOW_USERS.includes(currentUser.email);
           setHasAccess(userHasAccess);
           if (!userHasAccess) {
             showMessage("Access denied", "error");
@@ -68,7 +69,7 @@ function AppWithLogin({ children }) {
       }
       const currentUser = result.user;
       setUser(currentUser);
-      setHasAccess(currentUser.email === ALLOW_USER);
+      setHasAccess(ALLOW_USERS.includes(currentUser.email));
     } catch (error) {
       showMessage("Error signing in: " + error.message, "error");
     }
@@ -81,13 +82,15 @@ function AppWithLogin({ children }) {
   if (!isLoaded) {
     return <Center>Loading...</Center>;
   }
+  const isUserWithAccess = user && hasAccess;
   return (
     <div>
-      {user && hasAccess && cloneElement(children, { logout })}
+      {isUserWithAccess && cloneElement(children, { logout })}
       {(!user || !hasAccess) && (
         <Center>
           {user && !hasAccess && <div>Access denied</div>}
           <button onClick={signIn}>Sign in with Google</button>
+          <LoginForm />
         </Center>
       )}
       <Toast ref={toastCenter} position="center" />
