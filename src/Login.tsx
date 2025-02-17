@@ -17,15 +17,15 @@ export default function LoginForm ()  {
         }
     };
 
-    const handleSignUp = async () => {
-        try {
-            const userCredential = await createUserEmailAndPassword(email, password);
-            setUser(userCredential.user);
-            setError("");
-        } catch (err: any) {
-            setError(err.message);
-        }
-    };
+    // const handleSignUp = async () => {
+    //     try {
+    //         const userCredential = await createUserEmailAndPassword(email, password);
+    //         setUser(userCredential.user);
+    //         setError("");
+    //     } catch (err: any) {
+    //         setError(err.message);
+    //     }
+    // };
 
     const handleLogout = async () => {
         await signOut();
@@ -57,7 +57,7 @@ export default function LoginForm ()  {
                         style={{ display: "block", margin: "10px auto", padding: "8px" }}
                     />
                     <button onClick={handleLogin} style={{ margin: "5px" }}>Login</button>
-                    <button onClick={handleSignUp} style={{ margin: "5px" }}>Sign Up</button>
+                    {/* <button onClick={handleSignUp} style={{ margin: "5px" }}>Sign Up</button> */}
                     {error && <p style={{ color: "red" }}>{error}</p>}
                 </div>
             )}

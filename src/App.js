@@ -1,5 +1,5 @@
 import LoginWrapper from "./LoginWrapper";
-import { default as PDFApp } from "./pdfCreator/App";
+// import { default as PDFApp } from "./pdfCreator/App";
 import { default as TimelineApp } from "./timeline/App";
 import { Menubar } from "primereact/menubar";
 import { useState } from "react";
@@ -35,7 +35,7 @@ function App({ logout }) {
   return (
     <div>
       <Menubar model={items} />
-      {selection === PDF && <PDFApp />}
+      {/* {selection === PDF && <PDFApp />} */}
       {selection === TIMELINE && <TimelineApp />}
     </div>
   );
